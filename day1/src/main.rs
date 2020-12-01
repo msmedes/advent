@@ -37,20 +37,21 @@ fn part_two() {
     let mut file = read_file(String::from("input.txt"));
     file.sort();
 
-    for i in 0..file.len() {
+    for i in 0..file.len()-3 {
         let mut left = i + 1;
         let mut right = file.len() - 1;
         let val = file[i];
         while left < right {
             let l_val = file[left];
             let r_val = file[right];
-            if val + l_val + r_val == YEAR {
-                println!("{}", val * l_val * r_val);
-                break;
-            } else if val + l_val + r_val < YEAR {
-                left += 1;
-            } else {
-                right -= 1;
+            let total = val + l_val +r_val;
+            match total {
+                total if total == YEAR => {
+                    println!("{}", val * l_val * r_val);
+                    break;
+                }
+                total if total < YEAR => left += 1,
+                _ => right -= 1,
             }
         }
     }
