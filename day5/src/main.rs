@@ -3,32 +3,27 @@ use std::fs;
 fn main() {
     let passes = read_file("input.txt");
     let ids = calc_ids(passes);
-    let my_seat = find_seat(ids);
-    // let max_id = max_id(ids);
+    let my_seat = find_seat(ids).unwrap();
+    // let max_id = max_id(&ids);
     // println!("{}", max_id);
     println!("{}", my_seat);
 }
 
-fn find_seat(mut ids: Vec<usize>) -> usize {
-    let min = min_id(&ids);
-    let max = max_id(&ids);
-    ids.sort_unstable();
+fn find_seat(mut ids: Vec<usize>) -> Option<usize> {
+    ids.sort_unstable(); // idk clippy told me to use unstable
+    let min = ids[0];
+    let max = ids[ids.len() - 1];
 
     for seat in min..max {
         if seat != ids[seat - min] {
-            return seat;
+            return Some(seat);
         }
     }
-    // if nothing found
-    0
+    None
 }
 
 fn max_id(ids: &[usize]) -> usize {
     *ids.iter().max().unwrap()
-}
-
-fn min_id(ids: &[usize]) -> usize {
-    *ids.iter().min().unwrap()
 }
 
 fn calc_ids(passes: Vec<String>) -> Vec<usize> {
