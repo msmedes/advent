@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 use std::fs;
+use std::num::ParseIntError;
+use std::str::FromStr;
 
 #[derive(Debug)]
 enum Operation {
@@ -11,6 +13,23 @@ enum Operation {
 struct Instruction {
     operation: Operation,
     argument: isize,
+}
+
+impl FromStr for Instruction {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Instruction, ParseIntError> {
+        let mut pieces = s.trim().split_whitespace();
+        Ok(Instruction {
+            operation: match pieces.next().unwrap() {
+                "acc" => Operation::Acc,
+                "jmp" => Operation::Jmp,
+                "nop" => Operation::Nop,
+                _ => panic!("invalid operation"),
+            },
+            argument: pieces.next().unwrap().parse()?,
+        })
+    }
 }
 
 #[derive(Debug)]
@@ -90,7 +109,8 @@ impl VM {
 
 fn main() {
     let mut vm = VM::new("input.txt");
-    // vm.execute_program();
+    let _ = vm.execute_program();
+    vm.reset();
     vm.search_and_destroy();
 }
 
@@ -98,17 +118,6 @@ fn read_file(filename: &str) -> Vec<Instruction> {
     let contents = fs::read_to_string(filename).unwrap();
     contents
         .lines()
-        .map(|line| {
-            let mut pieces = line.trim().split_whitespace();
-            Instruction {
-                operation: match pieces.next().unwrap() {
-                    "acc" => Operation::Acc,
-                    "jmp" => Operation::Jmp,
-                    "nop" => Operation::Nop,
-                    _ => panic!("invalid operation"),
-                },
-                argument: pieces.next().unwrap().parse::<isize>().unwrap(),
-            }
-        })
+        .map(|line| line.trim().parse().unwrap())
         .collect()
 }
