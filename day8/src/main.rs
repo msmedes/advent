@@ -31,6 +31,12 @@ impl VM {
         }
     }
 
+    fn reset(&mut self) {
+        self.accumulator = 0;
+        self.cursor = 0;
+        self.executed.drain();
+    }
+
     fn execute_instruction(&mut self) {
         let instruction = &self.instructions[self.cursor as usize];
         match instruction.operation {
@@ -41,44 +47,55 @@ impl VM {
             Operation::Jmp => self.cursor += instruction.argument,
             Operation::Nop => self.cursor += 1,
         };
-        println!("{}", self.cursor);
     }
 
-    fn execute_program(&mut self) {
-        while !self.executed.contains(&(self.cursor as usize)) {
-            self.executed.insert(self.cursor as usize);
-            self.execute_instruction();
+    fn execute_program(&mut self) -> Result<isize, &'static str> {
+        while self.cursor < self.instructions.len() as isize {
+            if !self.executed.contains(&(self.cursor as usize)) {
+                self.executed.insert(self.cursor as usize);
+                self.execute_instruction();
+            } else {
+                return Err("loop");
+            }
         }
-        println!("{}", self.accumulator);
+        Ok(self.accumulator)
     }
-    
-    fn switch_operation(&mut self) -> {
+
+    fn search_and_destroy(&mut self) {
         for i in 0..self.instructions.len() {
-
+            self.change_instruction(i);
+            let answer = self.execute_program();
+            if answer.is_ok() {
+                println!("{}", answer.unwrap());
+                break;
+            }
+            self.change_instruction(i);
+            self.reset();
         }
     }
 
-    fn change_instruction(&mut self, i) {
-        let self.
+    fn change_instruction(&mut self, i: usize) {
+        let new_operation = match self.instructions[i].operation {
+            Operation::Jmp => Operation::Nop,
+            Operation::Nop => Operation::Jmp,
+            Operation::Acc => Operation::Acc,
+        };
+        // meh
+        self.instructions[i] = Instruction {
+            operation: new_operation,
+            argument: self.instructions[i].argument,
+        }
     }
 }
 
 fn main() {
     let mut vm = VM::new("input.txt");
-    vm.execute_program();
+    // vm.execute_program();
+    vm.search_and_destroy();
 }
 
 fn read_file(filename: &str) -> Vec<Instruction> {
     let contents = fs::read_to_string(filename).unwrap();
-    // let contents = "nop +0
-    // acc +1
-    // jmp +4
-    // acc +3
-    // jmp -3
-    // acc -99
-    // acc +1
-    // jmp -4
-    // acc +6";
     contents
         .lines()
         .map(|line| {
