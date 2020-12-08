@@ -49,16 +49,16 @@ impl VM {
         };
     }
 
-    fn execute_program(&mut self) -> Result<isize, &'static str> {
+    fn execute_program(&mut self) -> Result<(), &'static str> {
         while self.cursor < self.instructions.len() as isize {
             if !self.executed.contains(&(self.cursor as usize)) {
                 self.executed.insert(self.cursor as usize);
                 self.execute_instruction();
             } else {
-                return Err("loop");
+                return Err("don't worry about it");
             }
         }
-        Ok(self.accumulator)
+        Ok(())
     }
 
     fn search_and_destroy(&mut self) {
@@ -66,7 +66,7 @@ impl VM {
             self.change_instruction(i);
             let answer = self.execute_program();
             if answer.is_ok() {
-                println!("{}", answer.unwrap());
+                println!("{}", self.accumulator);
                 break;
             }
             self.change_instruction(i);
