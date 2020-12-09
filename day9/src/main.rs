@@ -27,7 +27,7 @@ fn two_sum(nums: &[isize], index: usize) -> bool {
         let complement = nums[index] - val;
         let contains = lookup.contains(&complement);
         if !contains {
-            lookup.insert(val as isize);
+            lookup.insert(val);
         } else if contains && val != complement {
             return true;
         }
@@ -36,6 +36,11 @@ fn two_sum(nums: &[isize], index: usize) -> bool {
 }
 
 fn find_sequence(nums: &[isize], target: isize) -> Option<isize> {
+    // I do not think a sliding window approach would work here for every valid
+    // input since the array is not sorted, and cannot be sorted. I can't think
+    // of any other ways to use the structure (or lack thereof) of the data to
+    // our advantage.
+
     for i in 0..nums.len() {
         let mut sum = nums[i];
         for j in i + 1..nums.len() {
