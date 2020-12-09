@@ -5,7 +5,7 @@ fn main() {
     let nums = read_file("input.txt");
     let weakness = find_weakness(&nums).unwrap();
     println!("{}", weakness);
-    let set_sum = find_sequence(&nums, weakness).unwrap();
+    let set_sum = find_sequence_window(&nums, weakness);
     println!("{}", set_sum);
 }
 
@@ -53,6 +53,23 @@ fn find_sequence(nums: &[isize], target: isize) -> Option<isize> {
         }
     }
     None
+}
+
+fn find_sequence_window(nums: &[isize], target: isize) -> isize {
+    let mut low = 0;
+    let mut high = 0;
+    let mut sum = 0;
+
+    while sum != target {
+        if sum > target {
+            sum -= nums[low];
+            low += 1;
+        } else if sum < target {
+            sum += nums[high];
+            high += 1;
+        }
+    }
+    nums[low..high + 1].iter().max().unwrap() + nums[low..high + 1].iter().min().unwrap()
 }
 
 fn read_file(filename: &str) -> Vec<isize> {
