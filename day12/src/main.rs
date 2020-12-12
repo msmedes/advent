@@ -52,6 +52,70 @@ fn part1(instructions: &Vec<Instruction>) {
     println!("{:?}, {}", position, distance_travelled);
 }
 
+fn part2(instructions: &Vec<Instruction>) {
+    let mut ship = Position {
+        x: 0,
+        y: 0,
+        direction: Direction::E,
+    };
+    let mut waypoint = Position {
+        x: 10,
+        y: -1,
+        direction: Direction::E,
+    };
+    for instruction in instructions {
+        println!("pre {:?} {:?}", ship, waypoint);
+        let positions = follow_instruction2(instruction, ship, waypoint);
+        ship = positions.0;
+        waypoint = positions.1;
+        println!("post {:?} {:?}", ship, waypoint);
+    }
+    println!("{}", ship.x.abs() + ship.y.abs());
+}
+
+fn follow_instruction2(
+    instruction: &Instruction,
+    ship: Position,
+    waypoint: Position,
+) -> (Position, Position) {
+    match instruction.action {
+        Action::N | Action::S | Action::E | Action::W => {
+            (ship, move_cardinal(instruction, waypoint))
+        }
+        Action::L | Action::R => rotate_waypoint(instruction, waypoint, ship),
+        Action::F => move_ship(instruction, ship, waypoint),
+    }
+}
+
+fn rotate_waypoint(
+    instruction: &Instruction,
+    waypoint: Position,
+    ship: Position,
+) -> (Position, Position) {
+    let angle = match instruction.action {
+        Action::L => -instruction.value,
+        Action::R => instruction.value,
+        _ => unreachable!(),
+    };
+    let rads = (angle as f64).to_radians();
+
+    // casts forever
+    let x = (waypoint.x as f64 * rads.cos() - waypoint.y as f64 * rads.sin()).round() as isize;
+    let y = (waypoint.x as f64 * rads.sin() + waypoint.y as f64 * rads.cos()).round() as isize;
+
+    (ship, Position { x, y, ..waypoint })
+}
+
+fn move_ship(
+    instruction: &Instruction,
+    ship: Position,
+    waypoint: Position,
+) -> (Position, Position) {
+    let x = ship.x + (waypoint.x * instruction.value);
+    let y = ship.y + (waypoint.y * instruction.value);
+    (Position { x, y, ..ship }, waypoint)
+}
+
 fn manhatty(origin: Position, result: &Position) -> usize {
     (origin.x - result.x).abs() as usize + (origin.y - result.y).abs() as usize
 }
@@ -147,7 +211,7 @@ fn move_cardinal(instruction: &Instruction, position: Position) -> Position {
 
 fn main() {
     let instructions = read_file("input.txt");
-    part1(&instructions);
+    part2(&instructions);
 }
 
 fn read_file(filename: &str) -> Vec<Instruction> {
@@ -155,7 +219,7 @@ fn read_file(filename: &str) -> Vec<Instruction> {
     // let contents = "F10
     // N3
     // F7
-    // L90
+    // R90
     // F11";
     contents
         .lines()
