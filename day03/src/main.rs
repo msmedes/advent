@@ -18,11 +18,10 @@ fn count_trees1(map: &Vec<String>){
     let mut count = 0;
     let mut col = 0;
     for row in map{
-        let row_str = &row;
-        if row_str.chars().nth(col).unwrap() == '#' {
+        if row.chars().nth(col).unwrap() == '#' {
             count += 1
         }
-        col = (col + 3) % row_str.len();
+        col = (col + 3) % row.len();
     }
     println!("{}", count); 
 }

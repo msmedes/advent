@@ -36,7 +36,7 @@ impl FromStr for Instruction {
 struct VM {
     accumulator: isize,
     cursor: isize,
-    instructions: Vec<Instruction>,
+    program: Vec<Instruction>,
     executed: HashSet<usize>,
 }
 
@@ -45,7 +45,7 @@ impl VM {
         VM {
             accumulator: 0,
             cursor: 0,
-            instructions: read_file(filename),
+            program: read_file(filename),
             executed: HashSet::new(),
         }
     }
@@ -57,7 +57,7 @@ impl VM {
     }
 
     fn execute_instruction(&mut self) {
-        let instruction = &self.instructions[self.cursor as usize];
+        let instruction = &self.program[self.cursor as usize];
         match instruction.operation {
             Operation::Acc => {
                 self.accumulator += instruction.argument;
@@ -69,7 +69,7 @@ impl VM {
     }
 
     fn execute_program(&mut self) -> Result<(), &'static str> {
-        while self.cursor < self.instructions.len() as isize {
+        while self.cursor < self.program.len() as isize {
             if !self.executed.contains(&(self.cursor as usize)) {
                 self.executed.insert(self.cursor as usize);
                 self.execute_instruction();
@@ -81,7 +81,7 @@ impl VM {
     }
 
     fn search_and_destroy(&mut self) {
-        for i in 0..self.instructions.len() {
+        for i in 0..self.program.len() {
             self.change_instruction(i);
             let answer = self.execute_program();
             if answer.is_ok() {
@@ -94,15 +94,15 @@ impl VM {
     }
 
     fn change_instruction(&mut self, i: usize) {
-        let new_operation = match self.instructions[i].operation {
+        let new_operation = match self.program[i].operation {
             Operation::Jmp => Operation::Nop,
             Operation::Nop => Operation::Jmp,
             Operation::Acc => Operation::Acc,
         };
         // meh
-        self.instructions[i] = Instruction {
+        self.program[i] = Instruction {
             operation: new_operation,
-            argument: self.instructions[i].argument,
+            argument: self.program[i].argument,
         }
     }
 }

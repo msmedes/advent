@@ -3,14 +3,13 @@ use std::fs;
 fn main() {
     let passports = read_file("input.txt");
     let fields = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
-    // let present_count = present(&passports, &fields);
+    let present_count = present(&passports, &fields);
     let num_valid = valid_count(&passports, &fields);
-    // println!("{}", present_count);
+    println!("{}", present_count);
     println!("{}", num_valid);
 }
 
 fn valid(passport: &str) -> bool {
-    // I foresee many match arms
     let fields = passport.split_whitespace();
     for field in fields {
         // lol
@@ -42,7 +41,7 @@ fn validate_ecl(value: &str) -> bool {
 }
 
 fn validate_pid(value: &str) -> bool {
-    return value.len() == 9 && value.parse::<i32>().is_ok();
+    value.len() == 9 && value.parse::<i32>().is_ok()
 }
 
 fn validate_hcl(value: &str) -> bool {

@@ -69,19 +69,20 @@ fn build_graph(bags: Vec<String>) -> (Graph, HashSet<String>) {
         nodes.insert(source.clone());
         let dests = dest_match.split(", ");
         for dest in dests {
-            if dest == "no other bags" {
-                continue;
+            if dest != "no other bags" {
+                let mut amount = String::from("");
+                let mut bag_type = String::from("");
+                for captures in re2.captures_iter(dest) {
+                    amount = captures.get(1).unwrap().as_str().to_string();
+                    bag_type = captures.get(2).unwrap().as_str().to_string();
+                }
+                graph
+                    .entry(source.clone())
+                    .and_modify(|vec| {
+                        vec.push((bag_type.clone(), amount.parse::<usize>().unwrap()))
+                    })
+                    .or_insert_with(|| vec![(bag_type.clone(), amount.parse::<usize>().unwrap())]);
             }
-            let mut amount = String::from("");
-            let mut bag_type = String::from("");
-            for captures in re2.captures_iter(dest) {
-                amount = captures.get(1).unwrap().as_str().to_string();
-                bag_type = captures.get(2).unwrap().as_str().to_string();
-            }
-            graph
-                .entry(source.clone())
-                .and_modify(|vec| vec.push((bag_type.clone(), amount.parse::<usize>().unwrap())))
-                .or_insert_with(|| vec![(bag_type.clone(), amount.parse::<usize>().unwrap())]);
         }
     }
 
