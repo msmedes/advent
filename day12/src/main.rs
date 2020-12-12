@@ -64,11 +64,9 @@ fn part2(instructions: &Vec<Instruction>) {
         direction: Direction::E,
     };
     for instruction in instructions {
-        println!("pre {:?} {:?}", ship, waypoint);
         let positions = follow_instruction2(instruction, ship, waypoint);
         ship = positions.0;
         waypoint = positions.1;
-        println!("post {:?} {:?}", ship, waypoint);
     }
     println!("{}", ship.x.abs() + ship.y.abs());
 }
