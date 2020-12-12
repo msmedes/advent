@@ -43,11 +43,11 @@ impl Room {
 
             for row in 0..self.height {
                 for col in 0..self.width {
-                    let neighbors = self.count_neighbors(row, col);
+                    let neighbors = self.count_neighbors2(row, col);
                     next[row as usize][col as usize] =
                         match (self.seats[row as usize][col as usize], neighbors) {
                             (Seat::Empty, 0) => Seat::Occupied,
-                            (Seat::Occupied, 4..=std::i32::MAX) => Seat::Empty,
+                            (Seat::Occupied, 5..=std::i32::MAX) => Seat::Empty,
                             (seat, _) => seat,
                         };
                 }
@@ -63,13 +63,40 @@ impl Room {
             .count()
     }
 
-    fn count_neighbors(&self, row: isize, col: isize) -> i32 {
+    fn count_neighbors1(&self, row: isize, col: isize) -> i32 {
         let mut count = 0;
         for (r, c) in &self.dirs {
             let (new_row, new_col) = (row + r, col + c);
             if 0 <= new_row && new_row < self.height && 0 <= new_col && new_col < self.width {
                 if self.seats[new_row as usize][new_col as usize] == Seat::Occupied {
                     count += 1
+                }
+            }
+        }
+        count
+    }
+
+    fn count_neighbors2(&self, row: isize, col: isize) -> i32 {
+        let mut count = 0;
+
+        for (r, c) in &self.dirs {
+            let mut new_row = row;
+            let mut new_col = col;
+            let mut found = false;
+            while !found {
+                new_row += r;
+                new_col += c;
+                if 0 <= new_row && new_row < self.height && 0 <= new_col && new_col < self.width {
+                    match self.seats[new_row as usize][new_col as usize] {
+                        Seat::Occupied => {
+                            count += 1;
+                            found = true;
+                        }
+                        Seat::Empty => found = true,
+                        Seat::Floor => continue,
+                    }
+                } else {
+                    break;
                 }
             }
         }
@@ -88,7 +115,7 @@ impl fmt::Display for Room {
                 };
                 write!(f, "{}", symbol)?;
             }
-            write!(f, "\n");
+            write!(f, "\n")?;
         }
         Ok(())
     }
@@ -106,17 +133,17 @@ fn part1(room: &mut Room) {
 }
 
 fn read_file(filename: &str) -> Vec<Vec<Seat>> {
-    // let contents = fs::read_to_string(filename).unwrap();
-    let contents = "L.LL.LL.LL
-    LLLLLLL.LL
-    L.L.L..L..
-    LLLL.LL.LL
-    L.LL.LL.LL
-    L.LLLLL.LL
-    ..L.L.....
-    LLLLLLLLLL
-    L.LLLLLL.L
-    L.LLLLL.LL";
+    let contents = fs::read_to_string(filename).unwrap();
+    // let contents = "L.LL.LL.LL
+    // LLLLLLL.LL
+    // L.L.L..L..
+    // LLLL.LL.LL
+    // L.LL.LL.LL
+    // L.LLLLL.LL
+    // ..L.L.....
+    // LLLLLLLLLL
+    // L.LLLLLL.L
+    // L.LLLLL.LL";
 
     contents
         .lines()
