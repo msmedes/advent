@@ -26,16 +26,16 @@ fn part1(depart: usize, buses: Vec<usize>) {
 }
 
 fn part2(buses: Vec<String>) {
-    let mut multiple: u128 = 1;
-    let mut step: u128 = 1;
-    let base = buses[0].parse::<u128>().unwrap();
+    let mut multiple = 1;
+    let mut step = 1;
+    let base = buses[0].parse::<usize>().unwrap();
 
     for (offset, bus) in buses.iter().enumerate() {
         if offset == 0 || *bus == "x" {
             continue;
         }
-        let bus_int = bus.parse::<u128>().unwrap();
-        while ((base * multiple) + offset as u128) % bus_int != 0 {
+        let bus_int = bus.parse::<usize>().unwrap();
+        while ((base * multiple) + offset) % bus_int != 0 {
             multiple += step;
         }
         step *= bus_int;
