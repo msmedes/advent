@@ -1,17 +1,21 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
+
+use rustc_hash::FxHashMap;
 
 fn main() {
     println!("{}", part1(vec![19, 0, 5, 1, 10, 13], 30000000));
 }
 
 fn part1(numbers: Vec<usize>, iterations: usize) -> usize {
-    let mut last_spoken = HashMap::<usize, usize>::new();
+    let mut last_spoken = FxHashMap::<usize, usize>::default();
+    let mut last_num = 0;
 
     for (i, num) in numbers.iter().enumerate() {
-        last_spoken.insert(*num, i);
+        if i > 0 {
+            last_spoken.insert(last_num, i);
+        }
+        last_num = *num;
     }
-
-    let mut last_num = numbers[numbers.len() - 1];
 
     for i in numbers.len()..iterations {
         let curr_num = match last_spoken.get(&last_num) {
