@@ -15,12 +15,8 @@ fn main() {
     .##.#.#.";
 
     let mut space = contents.parse::<Space>().unwrap();
-    // println!("{}", space);
-    // println!("{:#?}", space.grid);
     for _ in 0..6 {
         space.tick();
-        // println!("<----->");
-        // println!("{}", space);
     }
     println!("{}", space.count_active());
 }
