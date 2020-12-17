@@ -46,9 +46,6 @@ fn main() {
     dbg!(&valid_permutation);
 
     let mut mult = 1;
-    for (i, rule) in rules.iter().enumerate() {
-        if rule.name.starts_with("departure") {}
-    }
     for (i, rule_num) in valid_permutation.iter().enumerate() {
         if rules[*rule_num].name.starts_with("departure") {
             let index = valid_permutation[i];
