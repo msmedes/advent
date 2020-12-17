@@ -1,7 +1,6 @@
 use anyhow::Result;
 
-use std::collections::{HashMap, HashSet};
-use std::fmt;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 fn main() {
@@ -45,36 +44,23 @@ impl FromStr for Space {
 
     fn from_str(s: &str) -> Result<Space> {
         let mut grid = HashMap::<Coord, State>::new();
-        dbg!(s);
         for (y, line) in s.split('\n').enumerate() {
             let line = line.trim();
-            dbg!(line);
             for (x, char) in line.chars().enumerate() {
-                match char {
-                    '.' => {
-                        let _ = grid.insert(
-                            Coord {
-                                x: x as isize,
-                                y: y as isize,
-                                z: 0,
-                                w: 0,
-                            },
-                            State::Inactive,
-                        );
-                    }
-                    '#' => {
-                        let _ = grid.insert(
-                            Coord {
-                                x: x as isize,
-                                y: y as isize,
-                                z: 0,
-                                w: 0,
-                            },
-                            State::Active,
-                        );
-                    }
+                let state = match char {
+                    '.' => State::Inactive,
+                    '#' => State::Active,
                     _ => panic!("{}", char),
-                }
+                };
+                grid.insert(
+                    Coord {
+                        x: x as isize,
+                        y: y as isize,
+                        z: 0,
+                        w: 0,
+                    },
+                    state,
+                );
             }
         }
         Ok(Space { grid })

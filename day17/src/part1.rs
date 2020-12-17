@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
 
@@ -56,7 +56,7 @@ impl fmt::Display for Space {
         z_indices.sort_unstable();
 
         for z in z_indices {
-            writeln!(f, "z={}", z);
+            writeln!(f, "z={}", z)?;
             let coords = zs.get(&z).unwrap().clone();
             let mut ys: HashMap<isize, Vec<(Coord, State)>> = HashMap::new();
             for coord in coords {
@@ -75,11 +75,11 @@ impl fmt::Display for Space {
                         State::Active => "#",
                         State::Inactive => ".",
                     };
-                    write!(f, "{}", symbol);
+                    write!(f, "{}", symbol)?;
                 }
-                writeln!(f);
+                writeln!(f)?;
             }
-            writeln!(f);
+            writeln!(f)?;
         }
         Ok(())
     }
@@ -90,34 +90,23 @@ impl FromStr for Space {
 
     fn from_str(s: &str) -> Result<Space> {
         let mut grid = HashMap::<Coord, State>::new();
-        dbg!(s);
         for (y, line) in s.split('\n').enumerate() {
             let line = line.trim();
             dbg!(line);
             for (x, char) in line.chars().enumerate() {
-                match char {
-                    '.' => {
-                        let _ = grid.insert(
-                            Coord {
-                                x: x as isize,
-                                y: y as isize,
-                                z: 0,
-                            },
-                            State::Inactive,
-                        );
-                    }
-                    '#' => {
-                        let _ = grid.insert(
-                            Coord {
-                                x: x as isize,
-                                y: y as isize,
-                                z: 0,
-                            },
-                            State::Active,
-                        );
-                    }
+                let state = match char {
+                    '.' => State::Inactive,
+                    '#' => State::Active,
                     _ => panic!("{}", char),
-                }
+                };
+                grid.insert(
+                    Coord {
+                        x: x as isize,
+                        y: y as isize,
+                        z: 0,
+                    },
+                    state,
+                );
             }
         }
         Ok(Space { grid })
