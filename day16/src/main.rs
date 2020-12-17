@@ -1,10 +1,10 @@
 use anyhow::Result;
 use regex::Regex;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::str::FromStr;
 
 fn main() {
-    let (rules, mine, scanned) = read_file("input.txt");
+    let (rules, mine, scanned) = read_file("input2.txt");
 
     let rules: Vec<Rule> = rules
         .split('\n')
@@ -24,8 +24,6 @@ fn main() {
 
     let valid_tickets = valid_tickets(&rules, &scanned);
 
-    // this took me like 40 minutes to figure out
-    // ok maybe more like two hours.
     let valid_fields: Vec<Vec<HashSet<usize>>> = valid_tickets
         .iter()
         .map(|ticket| potential_rules(&rules, ticket))
@@ -43,13 +41,19 @@ fn main() {
 
     janky_solver(&valid_fields, &mut valid_permutation);
 
-    dbg!(&valid_permutation);
+    let mapped: Vec<String> = valid_permutation
+        .iter()
+        .map(|value| rules[*value].name.clone())
+        .collect();
+
+    println!("{:#?}", mapped);
 
     let mut mult = 1;
     for (i, rule_num) in valid_permutation.iter().enumerate() {
         if rules[*rule_num].name.starts_with("departure") {
             let index = valid_permutation[i];
             let val = mine.values[index];
+            println!("{} {}", index, val);
             mult *= val;
         }
     }
@@ -65,14 +69,15 @@ fn janky_solver(fields: &[HashSet<usize>], perm: &mut Vec<usize>) -> bool {
     let curr = &fields[perm.len()];
 
     for value in curr {
-        if !perm.contains(&value) {
-            perm.push(*value);
-
-            if janky_solver(fields, perm) {
-                return true;
-            }
-            perm.pop();
+        if perm.contains(&value) {
+            continue;
         }
+        perm.push(*value);
+
+        if janky_solver(fields, perm) {
+            return true;
+        }
+        perm.pop();
     }
     false
 }
