@@ -40,49 +40,6 @@ struct Space {
     grid: HashMap<Coord, State>,
 }
 
-impl fmt::Display for Space {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut zs: HashMap<isize, Vec<(Coord, State)>> = HashMap::new();
-        for coord in self.grid.keys() {
-            zs.entry(coord.z)
-                .and_modify(|set| {
-                    let _ = set.push((*coord, *self.grid.get(&coord).unwrap()));
-                })
-                .or_insert_with(|| vec![(*coord, *self.grid.get(&coord).unwrap())]);
-        }
-        let mut z_indices: Vec<isize> = zs.keys().copied().collect();
-        z_indices.sort_unstable();
-
-        for z in z_indices {
-            writeln!(f, "z={}", z);
-            let coords = zs.get(&z).unwrap().clone();
-            let mut ys: HashMap<isize, Vec<(Coord, State)>> = HashMap::new();
-            for coord in coords {
-                ys.entry(coord.0.y)
-                    .and_modify(|set| set.push(coord))
-                    .or_insert_with(|| vec![coord]);
-            }
-            let mut y_indices: Vec<isize> = ys.keys().copied().collect();
-            y_indices.sort_unstable();
-            // coords.sort_by(|a, b| a.0.y.cmp(&b.0.y).then_with(|| a.0.x.cmp(&b.0.x)));
-            for y in y_indices {
-                let mut xs = ys.get(&y).unwrap().clone();
-                xs.sort_by(|a, b| a.0.x.cmp(&b.0.x));
-                for x in xs {
-                    let symbol = match x.1 {
-                        State::Active => "#",
-                        State::Inactive => ".",
-                    };
-                    write!(f, "{}", symbol);
-                }
-                writeln!(f);
-            }
-            writeln!(f);
-        }
-        Ok(())
-    }
-}
-
 impl FromStr for Space {
     type Err = anyhow::Error;
 
