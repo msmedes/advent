@@ -8,3 +8,11 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.35"
+
+[[bin]]
+path = "src/part2.rs"
+name = "part2"
+
+[[bin]]
+path = "src/part1.rs"
+name = "part1"
