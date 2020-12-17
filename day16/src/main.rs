@@ -1,10 +1,10 @@
 use anyhow::Result;
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::str::FromStr;
 
 fn main() {
-    let (rules, mine, scanned) = read_file("input2.txt");
+    let (rules, mine, scanned) = read_file("input.txt");
 
     let rules: Vec<Rule> = rules
         .split('\n')
@@ -41,19 +41,10 @@ fn main() {
 
     janky_solver(&valid_fields, &mut valid_permutation);
 
-    let mapped: Vec<String> = valid_permutation
-        .iter()
-        .map(|value| rules[*value].name.clone())
-        .collect();
-
-    println!("{:#?}", mapped);
-
     let mut mult = 1;
     for (i, rule_num) in valid_permutation.iter().enumerate() {
         if rules[*rule_num].name.starts_with("departure") {
-            let index = valid_permutation[i];
-            let val = mine.values[index];
-            println!("{} {}", index, val);
+            let val = mine.values[i];
             mult *= val;
         }
     }
@@ -180,29 +171,6 @@ impl FromStr for Rule {
 
 fn read_file(filename: &str) -> (String, String, String) {
     let contents = std::fs::read_to_string(filename).unwrap();
-    // let contents = "class: 1-3 or 5-7
-    // row: 6-11 or 33-44
-    // seat: 13-40 or 45-50
-
-    // your ticket:
-    // 7,1,14
-
-    // nearby tickets:
-    // 7,3,47
-    // 40,4,50
-    // 55,2,20
-    // 38,6,12";
-    // let contents = "class: 0-1 or 4-19
-    // row: 0-5 or 8-19
-    // seat: 0-13 or 16-19
-
-    // your ticket:
-    // 11,12,13
-
-    // nearby tickets:
-    // 3,9,18
-    // 15,1,5
-    // 5,14,9";
 
     let mut sections = contents.split("\n\n");
 
