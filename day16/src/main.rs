@@ -1,6 +1,6 @@
 use anyhow::Result;
-use itertools::Itertools;
 use regex::Regex;
+use std::collections::HashSet;
 use std::str::FromStr;
 
 fn main() {
@@ -23,32 +23,75 @@ fn main() {
     // println!("{}", invalid);
 
     let valid_tickets = valid_tickets(&rules, &scanned);
-    let range: Vec<usize> = (0..valid_tickets[0].values.len()).collect();
-    println!("{:#?}", range);
-    for perm in range.iter().permutations(range.len()) {
-        if valid_permutation(&perm, &rules, &valid_tickets) {
-            let mut multiple = 1;
-            for value in perm {
-                let rule = &rules[*value];
-                if rule.name.starts_with("departure") {
-                    multiple *= mine.values[*value];
-                }
-            }
-            println!("I am not proud of how this went: {}", multiple);
-            break;
+
+    // this took me like 40 minutes to figure out
+    // ok maybe more like two hours.
+    let valid_fields: Vec<Vec<HashSet<usize>>> = valid_tickets
+        .iter()
+        .map(|ticket| potential_rules(&rules, ticket))
+        .collect();
+
+    let first = valid_fields[0].clone();
+    let valid_fields: Vec<HashSet<usize>> = valid_fields.iter().fold(first, |a, x| {
+        a.iter()
+            .zip(x)
+            .map(|(y, z)| y.intersection(&z).cloned().collect())
+            .collect()
+    });
+
+    let mut valid_permutation: Vec<usize> = vec![];
+
+    janky_solver(&valid_fields, &mut valid_permutation);
+
+    dbg!(&valid_permutation);
+
+    let mut mult = 1;
+    for (i, rule) in rules.iter().enumerate() {
+        if rule.name.starts_with("departure") {}
+    }
+    for (i, rule_num) in valid_permutation.iter().enumerate() {
+        if rules[*rule_num].name.starts_with("departure") {
+            let index = valid_permutation[i];
+            let val = mine.values[index];
+            mult *= val;
         }
     }
+    println!("{}", mult);
 }
 
-fn valid_permutation(permutations: &Vec<&usize>, rules: &Vec<Rule>, tickets: &Vec<Ticket>) -> bool {
-    for ticket in tickets {
-        for (index, perm) in permutations.iter().enumerate() {
-            if !rules[**perm].is_valid(ticket.values[index]) {
-                return false;
+fn janky_solver(fields: &[HashSet<usize>], perm: &mut Vec<usize>) -> bool {
+    // we made it to the end
+    if perm.len() == fields.len() {
+        return true;
+    }
+
+    let curr = &fields[perm.len()];
+
+    for value in curr {
+        if !perm.contains(&value) {
+            perm.push(*value);
+
+            if janky_solver(fields, perm) {
+                return true;
             }
+            perm.pop();
         }
     }
-    true
+    false
+}
+
+fn potential_rules(rules: &[Rule], ticket: &Ticket) -> Vec<HashSet<usize>> {
+    ticket
+        .values
+        .iter()
+        .map(|value| {
+            rules
+                .iter()
+                .enumerate()
+                .filter_map(|(i, rule)| if rule.is_valid(*value) { Some(i) } else { None })
+                .collect::<HashSet<usize>>()
+        })
+        .collect()
 }
 
 fn valid_tickets(rules: &[Rule], tickets: &[Ticket]) -> Vec<Ticket> {
@@ -95,10 +138,6 @@ impl FromStr for Ticket {
         Ok(Ticket { values })
     }
 }
-
-// type Rules = Vec<Rule>;
-// type Tickets = Vec<Ticket>;
-
 #[derive(Debug, Clone)]
 struct Rule {
     name: String,
