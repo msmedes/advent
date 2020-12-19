@@ -1,9 +1,9 @@
 fn main() {
-    // let lines = read_file("input.txt");
-    // let result: usize = lines.iter().map(|line| solve(line)).sum();
+    let lines = read_file("input.txt");
+    // let result: usize = lines.iter().map(|line| solve2(line)).sum();
     // println!("{}", result);
     let test = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2";
-    println!("{}", &test[11..12]);
+
     println!("{}", solve2(test));
 }
 
@@ -15,11 +15,11 @@ enum Operator {
 }
 
 fn solve2(math: &str) -> usize {
-    let (result, _) = helper2(math, 0, 0);
+    let (result, _) = helper2(math, 0);
     result
 }
 
-fn helper2(math: &str, start: usize, level: usize) -> (usize, usize) {
+fn helper2(math: &str, start: usize) -> (usize, usize) {
     let mut index = start;
     let mut result = 0;
     let mut curr_operator = Operator::None;
@@ -27,11 +27,6 @@ fn helper2(math: &str, start: usize, level: usize) -> (usize, usize) {
 
     while index < math.len() {
         let this_char = &math[index..index + 1];
-        println!(
-            "level: {} this_char: {}, index: {}",
-            level, this_char, index
-        );
-        dbg!(index, result, &curr_operator, current_value);
         match this_char {
             "+" => {
                 curr_operator = Operator::Add;
@@ -39,20 +34,16 @@ fn helper2(math: &str, start: usize, level: usize) -> (usize, usize) {
             }
             "*" => {
                 curr_operator = Operator::Mult;
-                println!("spawn * to level: {}", level + 1);
-                let (eval, next) = helper2(math, index + 1, level + 1);
-                println!("return at {}: {}", next, eval);
+                let (eval, next) = helper2(math, index + 1);
                 current_value = Some(eval);
                 index = next;
             }
             "(" => {
-                println!("spawn ( to level: {}", level + 1);
-                let (eval, next) = helper2(math, index + 1, level + 1);
+                let (eval, next) = helper2(math, index + 1);
                 current_value = Some(eval);
                 index = next;
             }
             ")" => {
-                println!("hello {} {}", result, index);
                 return (result, index);
             }
             " " => {
@@ -61,22 +52,12 @@ fn helper2(math: &str, start: usize, level: usize) -> (usize, usize) {
             }
             _ => current_value = Some((this_char).parse::<usize>().unwrap()),
         }
-        println!("pre result {}", result);
         result = match (&curr_operator, current_value) {
             (Operator::Add, Some(current_value)) => result + current_value,
             (Operator::Mult, Some(current_value)) => result * current_value,
             (Operator::None, Some(current_value)) => current_value,
             (_, None) => result,
         };
-        println!("POST");
-        dbg!(
-            level,
-            index,
-            this_char,
-            result,
-            &curr_operator,
-            current_value
-        );
         index += 1;
     }
     (result, index)
