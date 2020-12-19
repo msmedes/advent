@@ -1,13 +1,10 @@
 fn main() {
     let lines = read_file("input.txt");
-    // let result: usize = lines.iter().map(|line| solve2(line)).sum();
-    // println!("{}", result);
-    let test = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2";
-
-    println!("{}", solve2(test));
+    let result: usize = lines.iter().map(|line| solve2(line)).sum();
+    println!("{}", result);
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Operator {
     Mult,
     Add,
@@ -31,6 +28,7 @@ fn helper2(math: &str, start: usize) -> (usize, usize) {
             "+" => {
                 curr_operator = Operator::Add;
                 current_value = None;
+                index += 1
             }
             "*" => {
                 curr_operator = Operator::Mult;
@@ -44,13 +42,16 @@ fn helper2(math: &str, start: usize) -> (usize, usize) {
                 index = next;
             }
             ")" => {
-                return (result, index);
+                return (result, index + 1);
             }
             " " => {
                 index += 1;
                 continue;
             }
-            _ => current_value = Some((this_char).parse::<usize>().unwrap()),
+            _ => {
+                current_value = Some((this_char).parse::<usize>().unwrap());
+                index += 1
+            }
         }
         result = match (&curr_operator, current_value) {
             (Operator::Add, Some(current_value)) => result + current_value,
@@ -58,7 +59,9 @@ fn helper2(math: &str, start: usize) -> (usize, usize) {
             (Operator::None, Some(current_value)) => current_value,
             (_, None) => result,
         };
-        index += 1;
+        if curr_operator == Operator::Mult {
+            break;
+        }
     }
     (result, index)
 }
