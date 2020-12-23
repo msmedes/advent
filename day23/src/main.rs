@@ -3,8 +3,6 @@ use rustc_hash::FxHashMap;
 type Cups = FxHashMap<usize, usize>;
 
 fn main() {
-    // let mut vals = vec![3, 8, 9, 1, 2, 5, 4, 6, 7];
-    // let test2 = "54321";
     let input = "467528193";
     let mut vals: Vec<usize> = input
         .split("")
