@@ -1,5 +1,3 @@
-// use std::collections::HashMap;
-
 use rustc_hash::FxHashMap;
 
 fn main() {

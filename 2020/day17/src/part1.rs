@@ -14,12 +14,9 @@ fn main() {
     ....##.#
     .##.#.#.";
     let mut space = contents.parse::<Space>().unwrap();
-    println!("{}", space);
-    // println!("{:#?}", space.grid);
+
     for _ in 0..6 {
         space.tick();
-        // println!("<----->");
-        // println!("{}", space);
     }
     println!("{}", space.count_active());
 }
@@ -66,7 +63,6 @@ impl fmt::Display for Space {
             }
             let mut y_indices: Vec<isize> = ys.keys().copied().collect();
             y_indices.sort_unstable();
-            // coords.sort_by(|a, b| a.0.y.cmp(&b.0.y).then_with(|| a.0.x.cmp(&b.0.x)));
             for y in y_indices {
                 let mut xs = ys.get(&y).unwrap().clone();
                 xs.sort_by(|a, b| a.0.x.cmp(&b.0.x));

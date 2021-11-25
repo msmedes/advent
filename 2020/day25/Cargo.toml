@@ -1,5 +1,5 @@
 [package]
-name = "day20"
+name = "day25"
 version = "0.1.0"
 authors = ["Michael Smedes <smichaelmedes@gmail.com>"]
 edition = "2018"
@@ -7,6 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.36"
-itertools = "0.9.0"
-ndarray = "0.14.0"
+rustc-hash = "1.1.0"
+regex = "1.4.2"
+lazy_static = "1.4.0"

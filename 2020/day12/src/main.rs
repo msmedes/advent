@@ -128,7 +128,7 @@ fn follow_instruction(instruction: &Instruction, position: Position) -> Position
 fn move_relative(instruction: &Instruction, position: Position) -> Position {
     match instruction.action {
         Action::L | Action::R | Action::F => calc_new_direction(instruction, position),
-        _ => panic!("not a relative instruction"),
+        _ => unreachable!(),
     }
 }
 
@@ -179,7 +179,7 @@ fn calc_new_direction(instruction: &Instruction, position: Position) -> Position
                 },
             }
         }
-        _ => panic!("lol idk how you go this far"),
+        _ => unreachable!(),
     }
 }
 
@@ -203,7 +203,7 @@ fn move_cardinal(instruction: &Instruction, position: Position) -> Position {
             x: x - instruction.value,
             ..position
         },
-        _ => panic!("not a cardinal instruction"),
+        _ => unreachable!(),
     }
 }
 

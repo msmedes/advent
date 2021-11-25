@@ -49,24 +49,22 @@ fn recursive_game<'a>(
     deck1: &'a mut Deck,
     deck2: &'a mut Deck,
 ) -> (Option<&'a mut Deck>, Option<&'a mut Deck>) {
-    let mut prev_hands = FxHashSet::default();
+    let mut prev_hands = FxHashSet::<VecDeque<usize>>::default();
     while !deck1.is_empty() && !deck2.is_empty() {
-        let deck1_hash = deck1.iter().map(|i| i.to_string()).collect::<String>();
-        let deck2_hash = deck2.iter().map(|i| i.to_string()).collect::<String>();
-        if prev_hands.contains(&deck1_hash) || prev_hands.contains(&deck2_hash) {
+        if prev_hands.contains(deck1) || prev_hands.contains(&deck2) {
             return (Some(deck1), None);
         } else {
-            prev_hands.insert(deck1_hash);
-            prev_hands.insert(deck2_hash);
+            prev_hands.insert(deck1.clone());
+            prev_hands.insert(deck2.clone());
         }
         let card_one = deck1.pop_front().unwrap();
         let card_two = deck2.pop_front().unwrap();
         let deck1_winner: bool;
         if card_one <= deck1.len() && card_two <= deck2.len() {
-            // turns out VecDeque's can't have slices taken from them so I had to 
+            // turns out VecDeque's can't have slices taken from them so I had to
             // write this hideous double copy
             let deck1_vec: Vec<usize> = deck1.iter().cloned().collect();
-            let mut deck1_copy: VecDeque<usize> = deck1_vec[..card_one].iter().copied().collect();
+            let mut deck1_copy = deck1_vec[..card_one].iter().copied().collect();
             let deck2_vec: Vec<usize> = deck2.iter().cloned().collect();
             let mut deck2_copy = deck2_vec[..card_two].iter().copied().collect();
             let (deck1_recursive, deck2_recursive) =

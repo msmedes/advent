@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fs;
 
 use regex::Regex;
@@ -69,12 +69,12 @@ fn combos(
     mem_loc: String,
     value: usize,
     memory: &mut HashMap<usize, usize>,
-    x_set: &Vec<usize>,
+    x_set: &[usize],
     index: usize,
 ) {
     if index < x_set.len() {
         let mut this_zero = mem_loc.clone();
-        let mut this_one = mem_loc.clone();
+        let mut this_one = mem_loc;
         let location = x_set[index];
         this_zero.replace_range(location..location + 1, "0");
         this_one.replace_range(location..location + 1, "1");
