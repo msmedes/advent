@@ -106,34 +106,24 @@ impl BingoBoard {
 
     fn winner(&self) -> bool {
         // horizontal winners
-        for y in 0..5 {
-            let start = self.get_index(0, y);
-            let end = self.get_index(4, y);
-            let length = &self.cells[start..=end]
-                .iter()
-                .filter(|cell| (*cell).state == State::Marked)
-                .count();
-            if *length == 5 {
-                return true;
-            }
-        }
-        for x in 0..5 {
-            let mut row: Vec<usize> = vec![];
-            for y in 0..5 {
-                row.push(self.get_index(x, y));
-            }
-            let length = row
-                .iter()
-                .map(|index| self.cells[*index])
-                .collect::<Vec<Cell>>()
-                .iter()
-                .filter(|cell| cell.state == State::Marked)
-                .count();
-            if length == 5 {
-                return true;
-            }
-        }
-        false
+        let x_winner = (0..5)
+            .map(|y| {
+                self.cells[self.get_index(0, y)..=self.get_index(4, y)]
+                    .iter()
+                    .all(|cell| cell.state == State::Marked)
+            })
+            .any(|x| x);
+
+        let y_winner = (0..5)
+            .map(|x| {
+                (0..5)
+                    .map(|y| self.get_index(x, y))
+                    .map(|index| self.cells[index])
+                    .all(|cell| cell.state == State::Marked)
+            })
+            .any(|x| x);
+
+        x_winner || y_winner
     }
 }
 
