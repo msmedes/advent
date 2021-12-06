@@ -18,10 +18,8 @@ fn part1(lanternfish: Vec<usize>) -> usize {
     }
 
     for _ in 0..256 {
-        fish_counts = fish_counts
-            .iter()
-            .enumerate()
-            .map(|(index, _)| match index {
+        fish_counts = (0..9)
+            .map(|index| match index {
                 8 => fish_counts[0],
                 6 => fish_counts[7] + fish_counts[0],
                 other => fish_counts[other + 1],
