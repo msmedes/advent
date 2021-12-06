@@ -11,13 +11,12 @@ fn main() {
 }
 
 fn part1(lanternfish: Vec<usize>) -> usize {
-    let mut fish_counts = vec![0; 9];
+    let mut fish_counts = [0; 9];
 
     for fish in lanternfish {
         fish_counts[fish] += 1;
     }
     let mut prev_0 = fish_counts[0];
-    dbg!(&fish_counts, prev_0);
     for _ in 0..256 {
         (0..9).for_each(|index| {
             fish_counts[index] = match index {
