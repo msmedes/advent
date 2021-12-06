@@ -16,15 +16,17 @@ fn part1(lanternfish: Vec<usize>) -> usize {
     for fish in lanternfish {
         fish_counts[fish] += 1;
     }
-
+    let mut prev_0 = fish_counts[0];
+    dbg!(&fish_counts, prev_0);
     for _ in 0..256 {
-        fish_counts = (0..9)
-            .map(|index| match index {
-                8 => fish_counts[0],
-                6 => fish_counts[7] + fish_counts[0],
+        (0..9).for_each(|index| {
+            fish_counts[index] = match index {
+                8 => prev_0,
+                6 => prev_0 + fish_counts[7],
                 other => fish_counts[other + 1],
-            })
-            .collect();
+            };
+        });
+        prev_0 = fish_counts[0];
     }
 
     fish_counts.iter().sum()
