@@ -11,8 +11,6 @@ fn main() {
 }
 
 fn part1(lanternfish: Vec<usize>) -> usize {
-    // let mut map = HashMap::new();
-
     let mut fish_counts = vec![0; 9];
 
     for fish in lanternfish {
