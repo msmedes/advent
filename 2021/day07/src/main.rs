@@ -1,5 +1,3 @@
-use std::cmp;
-
 fn main() {
     let crabs: Vec<i64> = include_str!("../input.txt")
         .split(',')
@@ -15,31 +13,28 @@ fn main() {
 }
 
 fn part1(crabs: &[i64]) -> i64 {
-    let mut least_fuel = i64::MAX;
+    // let mut least_fuel = i64::MAX;
     let min = crabs.iter().min().unwrap();
     let max = crabs.iter().max().unwrap();
-    for dist in *min..=*max {
-        let fuel = crabs.iter().map(|c| i64::abs(c - dist)).sum();
-        least_fuel = cmp::min(least_fuel, fuel);
-    }
-
-    least_fuel
+    (*min..=*max)
+        .map(|i| crabs.iter().map(|c| i64::abs(c - i)).sum())
+        .min()
+        .unwrap()
 }
 
 fn part2(crabs: Vec<i64>) -> i64 {
-    let mut least_fuel = i64::MAX;
     let min = crabs.iter().min().unwrap();
     let max = crabs.iter().max().unwrap();
-    for dist in *min..=*max {
-        let fuel = crabs
-            .iter()
-            .map(|c| {
-                let d = i64::abs(c - dist);
-                (d * d + d) / 2
-            })
-            .sum();
-        least_fuel = cmp::min(least_fuel, fuel);
-    }
-
-    least_fuel
+    (*min..=*max)
+        .map(|i| {
+            crabs
+                .iter()
+                .map(|c| {
+                    let d = i64::abs(c - i);
+                    (d * d + d) / 2
+                })
+                .sum()
+        })
+        .min()
+        .unwrap()
 }
