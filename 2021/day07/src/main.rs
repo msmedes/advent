@@ -8,12 +8,11 @@ fn main() {
 
     let least_fuel = part1(&crabs);
     dbg!(least_fuel);
-    let least_fuel_triangle = part2(crabs);
+    let least_fuel_triangle = part2(&crabs);
     dbg!(least_fuel_triangle);
 }
 
 fn part1(crabs: &[i64]) -> i64 {
-    // let mut least_fuel = i64::MAX;
     let min = crabs.iter().min().unwrap();
     let max = crabs.iter().max().unwrap();
     (*min..=*max)
@@ -22,7 +21,7 @@ fn part1(crabs: &[i64]) -> i64 {
         .unwrap()
 }
 
-fn part2(crabs: Vec<i64>) -> i64 {
+fn part2(crabs: &[i64]) -> i64 {
     let min = crabs.iter().min().unwrap();
     let max = crabs.iter().max().unwrap();
     (*min..=*max)
