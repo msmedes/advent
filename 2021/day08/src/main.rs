@@ -1,5 +1,6 @@
 use hashbrown::{HashMap, HashSet};
 use itertools::Itertools;
+use rayon::prelude::*;
 fn main() {
     let input: Vec<(Vec<&str>, Vec<&str>)> = include_str!("../input.txt")
         .lines()
@@ -41,32 +42,17 @@ fn part2(input: Vec<(Vec<&str>, Vec<&str>)>) -> i64 {
     ];
     let display_set = display.iter().copied().collect::<HashSet<&str>>();
 
-    let mut sum: i64 = 0;
-
-    for (a, b) in input {
-        for perm in "abcdefg"
-            .split("")
-            .filter(|x| !x.is_empty())
-            .permutations(7)
-        {
-            let char_map = get_permutation_map(perm);
-            let first_mapping = a
-                .iter()
-                .map(|c| {
-                    c.split("")
-                        .filter(|x| !x.is_empty())
-                        .map(|letter| char_map.get(&letter).unwrap())
-                        .sorted()
-                        .join("")
-                })
-                .collect::<HashSet<String>>();
-            if first_mapping
-                == display_set
-                    .iter()
-                    .map(|x| x.to_string())
-                    .collect::<HashSet<String>>()
+    input
+        .par_iter()
+        .map(|(a, b)| {
+            let mut num = 0;
+            for perm in "abcdefg"
+                .split("")
+                .filter(|x| !x.is_empty())
+                .permutations(7)
             {
-                let second_mapping: Vec<String> = b
+                let char_map = get_permutation_map(perm);
+                let first_mapping = a
                     .iter()
                     .map(|c| {
                         c.split("")
@@ -75,18 +61,32 @@ fn part2(input: Vec<(Vec<&str>, Vec<&str>)>) -> i64 {
                             .sorted()
                             .join("")
                     })
-                    .collect();
-                let num = second_mapping
-                    .iter()
-                    .map(|numeral| display.iter().position(|n| n == numeral).unwrap())
-                    .join("")
-                    .parse::<i64>()
-                    .unwrap();
-                sum += num;
-                break;
+                    .collect::<HashSet<String>>();
+                if first_mapping
+                    == display_set
+                        .iter()
+                        .map(|x| x.to_string())
+                        .collect::<HashSet<String>>()
+                {
+                    let second_mapping: Vec<String> = b
+                        .iter()
+                        .map(|c| {
+                            c.split("")
+                                .filter(|x| !x.is_empty())
+                                .map(|letter| char_map.get(&letter).unwrap())
+                                .sorted()
+                                .join("")
+                        })
+                        .collect();
+                    num = second_mapping
+                        .iter()
+                        .map(|numeral| display.iter().position(|n| n == numeral).unwrap())
+                        .join("")
+                        .parse::<i64>()
+                        .unwrap();
+                }
             }
-        }
-    }
-
-    sum
+            num
+        })
+        .sum()
 }
