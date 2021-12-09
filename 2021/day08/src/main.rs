@@ -84,6 +84,7 @@ fn part2(input: Vec<(Vec<&str>, Vec<&str>)>) -> i64 {
                         .join("")
                         .parse::<i64>()
                         .unwrap();
+                    break;
                 }
             }
             num
