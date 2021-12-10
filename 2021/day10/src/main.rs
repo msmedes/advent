@@ -93,7 +93,7 @@ fn part2(input: &[Vec<&str>]) {
         .flatten()
         .collect();
 
-    values.sort();
+    values.sort_unstable();
     let mid_point = values.len() / 2;
     let mid_value = values[mid_point];
     dbg!(mid_value);
