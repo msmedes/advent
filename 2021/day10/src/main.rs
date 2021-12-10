@@ -95,6 +95,6 @@ fn part2(input: &[Vec<&str>]) {
 
     values.sort_unstable();
     let mid_point = values.len() / 2;
-    let mid_value = values[mid_point];
-    dbg!(mid_value);
+    let median = values[mid_point];
+    dbg!(median);
 }
