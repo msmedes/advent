@@ -199,7 +199,7 @@ fn main() {
 }
 
 fn part1(grid: &mut Grid) {
-    for _ in 0..194 {
+    for _ in 0..100 {
         grid.step();
     }
     println!("{}", grid);
