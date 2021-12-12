@@ -106,6 +106,8 @@ impl Grid {
         ready_to_flash
             .iter()
             .for_each(|point| self.propagate_flash(*point, &mut flashed));
+
+        self.flashes += flashed.len();
     }
 
     fn propagate_flashes_with_count(&mut self) -> usize {
@@ -130,13 +132,11 @@ impl Grid {
     }
 
     fn propagate_flash(&mut self, point: Point, flashed: &mut Flashed) {
-        // println!("{}", self);
         let mut queue = VecDeque::from([point]);
 
         while !queue.is_empty() {
             let curr_point = queue.pop_front().unwrap();
             if !flashed.contains(&curr_point) {
-                self.flashes += 1;
                 flashed.insert(curr_point);
                 let neighbors = self.get_neighbors(curr_point.0, curr_point.1);
                 for neighbor in neighbors {
@@ -202,7 +202,6 @@ fn part1(grid: &mut Grid) {
     for _ in 0..100 {
         grid.step();
     }
-    println!("{}", grid);
     println!("{}", grid.flashes);
 }
 
