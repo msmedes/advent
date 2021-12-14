@@ -111,7 +111,6 @@ impl fmt::Display for Manual {
         let max_y = self.points.iter().map(|point| point.y).max().unwrap() + 1;
         let min_x = self.points.iter().map(|point| point.x).min().unwrap();
         let max_x = self.points.iter().map(|point| point.x).max().unwrap() + 1;
-        println!("{} {} {} {}", min_x, min_y, max_x, max_y);
 
         for y in min_y..max_y {
             for x in min_x..max_x {
