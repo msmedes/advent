@@ -118,7 +118,7 @@ impl fmt::Display for Manual {
                     true => "#",
                     false => ".",
                 };
-                write!(f, "{}", dot)?;
+                write!(f, "{} ", dot)?;
             }
             writeln!(f)?;
         }
