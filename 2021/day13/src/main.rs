@@ -76,7 +76,7 @@ impl Manual {
                 Axis::X => {
                     if point.x > fold.value {
                         Point {
-                            x: point.x - (2 * (point.x - fold.value)),
+                            x: 2 * fold.value - point.x,
                             y: point.y,
                         }
                     } else {
@@ -87,7 +87,7 @@ impl Manual {
                     if point.y > fold.value {
                         Point {
                             x: point.x,
-                            y: point.y - (2 * (point.y - fold.value)),
+                            y: 2 * fold.value - point.y,
                         }
                     } else {
                         *point
@@ -116,7 +116,7 @@ impl fmt::Display for Manual {
             for x in min_x..max_x {
                 let dot = match self.points.contains(&Point { x, y }) {
                     true => "#",
-                    false => ".",
+                    false => " ",
                 };
                 write!(f, "{} ", dot)?;
             }
