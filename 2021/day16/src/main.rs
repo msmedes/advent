@@ -1,25 +1,31 @@
-// first 3 bits: version
-// first 3 bits: type id
+use anyhow::{Error, Result};
+use std::io::prelude::*;
+use std::io::Cursor;
+use std::str;
+use std::str::FromStr;
 
-// type id 4 is a literal
-// padded wth leading zeros until it's length is a multiple of 4 bits
-// then grouped into groups of four bits
-// each group is prefaced by  1 except the last which is prefaced by 0
-
-enum LengthTypeID {
-    SubPacketLength,
-    NumSubPackets,
+#[derive(Debug, Clone)]
+struct Packet {
+    version: u64,
+    type_id: u64,
+    packets: Vec<Box<Packet>>,
+    literal: Option<u64>,
 }
 
-enum PacketType {
-    Literal,
-    Operator,
+#[derive(Debug)]
+struct Stream {
+    stream: Cursor<Vec<u8>>,
 }
 
-fn hex_to_binary(s: &str) -> String {
-    format!("{:04b}", u8::from_str_radix(s, 16).unwrap())
-}
+impl FromStr for Stream {
+    type Err = Error;
 
+    fn from_str(s: &str) -> Result<Self> {
+        let binary_stream = binary_from_hex(s);
+        let stream = Cursor::new(binary_stream.as_bytes().to_vec());
+        Ok(Stream { stream })
+    }
+}
 fn binary_from_hex(s: &str) -> String {
     let mut binary = String::new();
     for c in s.chars() {
@@ -28,46 +34,141 @@ fn binary_from_hex(s: &str) -> String {
     binary
 }
 
-fn int_from_binary(s: &str) -> u32 {
-    u32::from_str_radix(s, 2).unwrap()
-}
+impl Stream {
+    fn read(&mut self, buf: &mut [u8]) -> u64 {
+        let _ = self.stream.read(buf).unwrap();
+        let string = str::from_utf8(buf).unwrap();
+        u64::from_str_radix(string, 2).unwrap()
+    }
 
-fn parse_literal(s: &str) -> Option<(u32, usize)> {
-    let mut literal = String::new();
-    let mut breakpoint = 0;
-    for i in (0..s.len()).step_by(5) {
-        literal.push_str(&s[i + 1..i + 5]);
-        if s.chars().nth(i).unwrap() == '0' {
-            breakpoint = i + 5;
-            break;
+    fn read_literal(&mut self) -> u64 {
+        let mut output = String::new();
+        let mut more = 1;
+        while more == 1 {
+            more = self.read(&mut [0; 1]);
+            let piece = self.read(&mut [0; 4]);
+            output.push_str(&format!("{:04b}", piece));
         }
+        u64::from_str_radix(&output, 2).unwrap()
     }
-    if literal.len() == 0 {
-        return None;
-    }
-    Some((int_from_binary(&literal), breakpoint))
-}
 
-fn parse_packet(s: &str) -> u32 {
-    let version_number = int_from_binary(&s[..3]);
-    let type_id = int_from_binary(&s[3..6]);
-    let mut sub_packet_version_numbers = 0;
-    if type_id == 4 {
-        let (_, packet_end) = parse_literal(&s[6..]).unwrap();
-    } else {
-        let length_type_id = int_from_binary(&s[6..7]);
-        if length_type_id == 0 {
+    fn position(&mut self) -> u64 {
+        self.stream.position()
+    }
+
+    fn read_packet(&mut self) -> Packet {
+        let version = self.read(&mut [0; 3]);
+        let type_id = self.read(&mut [0; 3]);
+        let mut packets = vec![];
+        let mut literal = None;
+        if type_id == 4 {
+            literal = Some(self.read_literal());
         } else {
-            let num_subpackets = int_from_binary(&s[7..18]);
-            sub_packet_version_numbers += parse_packet()
+            let length_type_id = self.read(&mut [0; 1]);
+            if length_type_id == 0 {
+                let total_length = self.read(&mut [0; 15]);
+                let start = self.position();
+                while self.position() - start < total_length {
+                    let packet = self.read_packet();
+                    packets.push(Box::new(packet));
+                }
+            } else {
+                let packet_count = self.read(&mut [0; 11]);
+                for _ in 0..packet_count {
+                    let packet = self.read_packet();
+                    packets.push(Box::new(packet));
+                }
+            }
+        }
+        Packet {
+            version,
+            type_id,
+            packets,
+            literal,
         }
     }
-    version_number + sub_packet_version_numbers
+}
+
+fn hex_to_binary(s: &str) -> String {
+    format!("{:04b}", u8::from_str_radix(s, 16).unwrap())
+}
+
+fn int_from_binary(s: &str) -> u64 {
+    u64::from_str_radix(s, 2).unwrap()
+}
+
+fn parse_hex(hex: &str) -> Packet {
+    let mut stream = Stream::from_str(hex).unwrap();
+    stream.read_packet()
+}
+
+fn part1(packet: Packet) -> u64 {
+    let mut version_sum = packet.version;
+    if packet.type_id != 4 {
+        for p in packet.packets {
+            version_sum += part1(*p);
+        }
+    }
+    version_sum
+}
+
+fn eval(packet: Packet) -> u64 {
+    match packet.type_id {
+        0 => packet.packets.iter().map(|p| eval(*p.clone())).sum(),
+        1 => packet.packets.iter().map(|p| eval(*p.clone())).product(),
+        2 => packet
+            .packets
+            .iter()
+            .map(|p| eval(*p.clone()))
+            .min()
+            .unwrap(),
+        3 => packet
+            .packets
+            .iter()
+            .map(|p| eval(*p.clone()))
+            .max()
+            .unwrap(),
+        4 => packet.literal.unwrap(),
+        5 => {
+            if eval((*packet.packets[0]).clone()) > eval(*(packet.packets[1]).clone()) {
+                1
+            } else {
+                0
+            }
+        }
+        6 => {
+            if eval((*packet.packets[0]).clone()) < eval(*(packet.packets[1]).clone()) {
+                1
+            } else {
+                0
+            }
+        }
+        7 => {
+            if eval((*packet.packets[0]).clone()) == eval(*(packet.packets[1]).clone()) {
+                1
+            } else {
+                0
+            }
+        }
+        _ => panic!("unknown type id"),
+    }
+}
+
+fn part2(packet: Packet) {
+    dbg!(eval(packet));
 }
 
 fn main() {
-    let test = "D2FE28";
-    assert_eq!(binary_from_hex(test), "110100101111111000101000");
-    assert_eq!(int_from_binary("110"), 6);
-    assert_eq!(parse_packet(&binary_from_hex(test)), 2021);
+    // let test = "D2FE28";
+    // assert_eq!(binary_from_hex(test), "110100101111111000101000");
+    // assert_eq!(int_from_binary("110"), 6);
+    // parse_hex(test);
+    // let test2 = "38006F45291200";
+    // parse_hex(test2);
+    // let test3 = "A0016C880162017C3686B18A3D4780";
+    // let packet = parse_hex(test3);
+    let input = include_str!("../input.txt");
+    let packet = parse_hex(input);
+    // dbg!(part1(packet));
+    part2(packet);
 }
