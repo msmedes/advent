@@ -17,7 +17,6 @@ def part1(monkeys):
             monkey.play_round(monkeys, lcm)
     
     sorted_monkeys = sorted(monkeys, key=lambda x: x.items_inspected, reverse=True)
-    print('sorted monkeys', sorted_monkeys)
     return sorted_monkeys[0].items_inspected * sorted_monkeys[1].items_inspected
 
 class Monkey:
