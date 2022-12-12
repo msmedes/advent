@@ -1,0 +1,19 @@
+[package]
+name = "advent_2022"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "day01"
+path = "src/01/day01.rs"
+
+[[bin]]
+name = "day02"
+path = "src/02/day02.rs"
+
+[[bin]]
+name = "day03"
+path = "src/03/day03.rs"
+
+[dependencies]
+anyhow = "1.0.66"

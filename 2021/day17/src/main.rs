@@ -1,4 +1,3 @@
-use std::num;
 use std::ops::Range;
 fn main() {
     // input = target area: x=269..292, y=-68..-44
@@ -13,7 +12,7 @@ fn main() {
 
 fn part2(area: TargetArea) {
     let lowest_x = area.lowest_x();
-    let x_ranges: Vec<(i64, i64, i64)> = (lowest_x..=area.x2)
+    let x_ranges: Vec<(i64, i64)> = (lowest_x..=area.x2)
         .map(|x| area.steps_inbound_for_x(x))
         .flatten()
         .collect();
@@ -50,7 +49,7 @@ impl TargetArea {
         val
     }
 
-    fn steps_inbound_for_x(&self, x: i64) -> Option<(i64, i64, i64)> {
+    fn steps_inbound_for_x(&self, x: i64) -> Option<(i64, i64)> {
         let min_x = std::cmp::min(self.x1, self.x2);
         let max_x = std::cmp::max(self.x1, self.x2);
         let mut steps = 0;
@@ -77,18 +76,18 @@ impl TargetArea {
         if min_steps == i64::MAX && max_steps == i64::MIN {
             None
         } else {
-            Some((min_steps, max_steps, x))
+            Some((min_steps, max_steps))
         }
     }
 
-    fn steps_inbound_for_y(&self, y: i64, x_ranges: &[(i64, i64, i64)]) -> usize {
+    fn steps_inbound_for_y(&self, y: i64, x_ranges: &[(i64, i64)]) -> usize {
         let mut count = 0;
+        let max_y = std::cmp::max(self.y1, self.y2);
+        let min_y = std::cmp::min(self.y1, self.y2);
 
         for x_range in x_ranges {
             let mut velocity = y;
             let mut position = 0;
-            let max_y = std::cmp::max(self.y1, self.y2);
-            let min_y = std::cmp::min(self.y1, self.y2);
             let mut steps = 0;
 
             if y < 1 {
