@@ -3,8 +3,8 @@ def main():
     with open('inputs/day12.txt') as f:
         grid = [[c for c in line.strip()] for line in f]
 
-    answer1 = part1(grid)
-    print(answer1)
+    # answer1 = part1(grid)
+    # print(answer1)
     answer2 = part2(grid)
     print(answer2)
 
@@ -21,7 +21,7 @@ def part2(grid):
     grid[end[1]][end[0]] = 'z'
     grid[start[1]][start[0]] = 'a' 
     all_as_baby = get_as(grid)
-    return min(bfs(a, end, grid) for a in all_as_baby if a)
+    return min(bfs(a, end, grid) for a in all_as_baby)
 
 def get_as(grid):
     a_s = []
