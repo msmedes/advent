@@ -20,16 +20,18 @@ def part_1(instructions):
 def part_2(instructions):
     matches = match_mul_with_commands(instructions)
     total = 0
-    we_are = True
-    for match in matches:
-        if match == "don't()":
-            we_are = False
-            continue
-        elif match == "do()":
-            we_are = True
-            continue
-        if we_are:
-            total += multiply_multipliers(match)
+    should_multiply = True
+    
+    # imperative and I HATE IT
+    for operation in matches:
+        match operation:
+            case "don't()":
+                should_multiply = False
+            case "do()":
+                should_multiply = True
+            case mul if should_multiply:
+                total += multiply_multipliers(mul)
+                
     return total
 
 
