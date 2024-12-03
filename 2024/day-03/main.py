@@ -42,9 +42,8 @@ def part_2_recursive_helper(instructions, should_multiply, total):
             should_multiply = False
         case "do()":
             should_multiply = True
-        case mul:
-            if should_multiply:
-                total += multiply_multipliers(mul)
+        case mul if should_multiply:
+            total += multiply_multipliers(mul)
     return part_2_recursive_helper(instructions[1:], should_multiply, total)
 
 def part_2_recursive(instructions):
