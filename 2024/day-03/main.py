@@ -34,7 +34,22 @@ def part_2(instructions):
                 
     return total
 
+def part_2_recursive_helper(instructions, should_multiply, total):
+    if not instructions:
+        return total
+    match instructions[0]:
+        case "don't()":
+            should_multiply = False
+        case "do()":
+            should_multiply = True
+        case mul:
+            if should_multiply:
+                total += multiply_multipliers(mul)
+    return part_2_recursive_helper(instructions[1:], should_multiply, total)
 
+def part_2_recursive(instructions):
+    matches = match_mul_with_commands(instructions)
+    return part_2_recursive_helper(matches, True, 0)
 
 def match_mul(text):
     return re.findall(r'mul\(\d{1,3},\d{1,3}\)', text)
@@ -43,9 +58,10 @@ def match_mul_with_commands(text):
     return re.findall(r"(mul\(\d{1,3},\d{1,3}\)|(?:do|don't)\(\))", text)
 
 def main():
+
     data = process_input()
     part1 = part_1(data)
-    part2 = part_2(data)
+    part2 = part_2_recursive(data)
     print(f"Part 1: {part1}")
     print(f"Part 2: {part2}")
 
