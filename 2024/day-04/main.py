@@ -46,7 +46,7 @@ def part_1(word_search):
     return sum(
         traverse_from_coord(coord, x_delta, y_delta, word_search)
         for coord in x_coords
-        for x_delta, y_delta in utils.all_coords(coord)
+        for x_delta, y_delta in utils.all_deltas(coord)
     )
 
 
@@ -56,7 +56,7 @@ rotations = {tuple(sequence[i:] + sequence[:i]) for i in range(len(sequence))}
 
 def check_pattern(coord, word_search):
     diagonal_coords = [
-        (coord[0] + x, coord[1] + y) for x, y in utils.diagonal_coords(coord)
+        (coord[0] + x, coord[1] + y) for x, y in utils.diagonal_deltas(coord)
     ]
     diagonal_sequence = {
         tuple(
