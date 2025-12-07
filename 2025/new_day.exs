@@ -53,12 +53,12 @@ end
 # Main execution
 case System.argv() do
   [] ->
-    input = File.read!("input.txt")
+    input = File.read!("inputs/day#{day_num}/input.txt")
     IO.puts("Part 1: #{Day#{day_num}.part1(input)}")
     IO.puts("Part 2: #{Day#{day_num}.part2(input)}")
 
   ["--test"] ->
-    test_input = File.read!("test_input.txt")
+    test_input = File.read!("inputs/day#{day_num}/test_input.txt")
     IO.puts("Test Part 1: #{Day#{day_num}.part1(test_input)}")
     IO.puts("Test Part 2: #{Day#{day_num}.part2(test_input)}")
 

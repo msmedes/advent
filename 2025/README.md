@@ -32,20 +32,11 @@ elixir day-01.exs --test
 
 This will read from `test_input.txt` instead.
 
-## File Structure
-
-For each day, you'll typically have:
-- `day-XX.exs` - The solution script
-- `input.txt` - Your puzzle input
-- `test_input.txt` - Test input (optional)
-
-## Example
-
 ```bash
 # Create day 1
 elixir new_day.exs 1
 
-# Add your input
+# Add input
 # (paste input into input.txt)
 
 # Run it

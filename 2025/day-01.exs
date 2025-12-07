@@ -70,7 +70,9 @@ defmodule Day01 do
         {curr_acc, pass_zero_count + count}
       end)
 
-    zero_count = scanned |> Enum.count(fn {value, _count} -> value == 0 end)
+    zero_count =
+      scanned
+      |> Enum.count(fn {value, _count} -> value == 0 end)
 
     {_final_value, final_count} = List.last(scanned)
 
