@@ -55,7 +55,7 @@ defmodule Day01 do
         pass_zero_count =
           case direction do
             "L" when acc - amount < 0 -> calc_pass_zero(abs(acc - amount), acc)
-            "R" when rem(acc + amount, 100) != 0 -> div(acc + amount, 100) - div(acc, 100)
+            "R" when rem(acc + amount, 100) != 0 -> div(acc + amount, 100)
             _ -> 0
           end
 
