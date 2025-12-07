@@ -36,7 +36,7 @@ defmodule Day01 do
       end)
       |> Enum.count(&(&1 == 0))
 
-    IO.puts(answer)
+    answer
   end
 
   defp divmod(a, b) do
