@@ -43,40 +43,26 @@ defmodule Day01 do
     {div(a, b), rem(a, b)}
   end
 
-  defp calc_pass_zero(val, acc) do
-    {loops, remainder} = divmod(val, 100)
-    loops + if remainder > 0 && acc > 0, do: 1, else: 0
-  end
-
   defp solve_part2(rotations) do
     scanned =
       rotations
       |> Enum.scan({50, 0}, fn {direction, amount}, {acc, count} ->
-        pass_zero_count =
+        {full_rotations, steps} = divmod(amount, 100)
+
+        new_position =
           case direction do
-            "L" when acc - amount < 0 -> calc_pass_zero(abs(acc - amount), acc)
-            "R" when rem(acc + amount, 100) != 0 -> div(acc + amount, 100)
-            _ -> 0
+            "L" -> acc - steps
+            "R" -> acc + steps
           end
 
-        IO.puts("acc: #{acc} - pass zero count for #{direction}#{amount} #{pass_zero_count}")
+        passed_or_landed = if acc != 0 and new_position not in 1..99, do: 1, else: 0
 
-        curr_acc =
-          case direction do
-            "L" -> Integer.mod(acc - amount, 100)
-            "R" -> Integer.mod(acc + amount, 100)
-          end
-
-        {curr_acc, pass_zero_count + count}
+        {Integer.mod(new_position, 100), count + passed_or_landed + full_rotations}
       end)
-
-    zero_count =
-      scanned
-      |> Enum.count(fn {value, _count} -> value == 0 end)
 
     {_final_value, final_count} = List.last(scanned)
 
-    final_count + zero_count
+    final_count
   end
 end
 
