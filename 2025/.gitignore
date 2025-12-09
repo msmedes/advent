@@ -1,0 +1,29 @@
+# Mix build artifacts
+/_build
+/deps
+
+# Dependencies
+/deps/*
+!/deps/.keep
+
+# Temporary files
+/.elixir_ls/
+/rel/
+/tmp/
+/cover/
+/doc/
+/build/
+/escript/
+*.ez
+*.tar.gz
+*.trace
+*.dump
+*.log
+*.sqlite3
+*.db
+*.bak
+*.swp
+*~
+.#*
+.DS_Store
+Thumbs.db
